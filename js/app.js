@@ -140,7 +140,16 @@ function onLogout() {
 function enterApp() {
   el.auth.classList.add('hidden');
   el.app.classList.remove('hidden');
+  if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
   render();
+  scrollToTop();
+}
+
+// Remonte la vue tout en haut (le clavier iOS laisse parfois la page décalée).
+function scrollToTop() {
+  window.scrollTo(0, 0);
+  // iOS applique parfois le scroll un cran trop tôt : on repasse au tick suivant.
+  requestAnimationFrame(() => window.scrollTo(0, 0));
 }
 
 function changeMonth(delta) {
@@ -148,6 +157,7 @@ function changeMonth(delta) {
   if (viewMonth < 0) { viewMonth = 11; viewYear--; }
   if (viewMonth > 11) { viewMonth = 0; viewYear++; }
   render();
+  scrollToTop();
 }
 
 function render() {
