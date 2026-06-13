@@ -1,7 +1,7 @@
 // service-worker.js — cache applicatif pour le mode hors-ligne.
 // On ne met en cache QUE les fichiers de l'app (jamais de données).
 
-const CACHE = 'cyclo-v1';
+const CACHE = 'cyclo-v2';
 const ASSETS = [
   './',
   './index.html',

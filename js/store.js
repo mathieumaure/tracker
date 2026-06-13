@@ -14,7 +14,6 @@ const session = {
   token: null,        // token GitHub déchiffré
   gistId: null,
   salt: null,         // Uint8Array
-  username: '',
   data: emptyData(),  // données déchiffrées
   remoteUpdatedAt: 0, // updatedAt de la dernière version distante connue
   changedDays: new Set(), // jours modifiés localement (pour la fusion)
@@ -30,11 +29,6 @@ export function getData() {
 
 export function isConfigured() {
   return !!localStorage.getItem(CONFIG_KEY);
-}
-
-export function getUsername() {
-  const cfg = readConfig();
-  return cfg ? cfg.username : '';
 }
 
 function readConfig() {
@@ -67,7 +61,6 @@ async function persistConfig() {
   const tokenEnc = await encryptString(session.key, session.token);
   const cache = await encryptJSON(session.key, session.data);
   writeConfig({
-    username: session.username,
     gistId: session.gistId,
     salt: toB64(session.salt),
     tokenEnc,
@@ -79,7 +72,7 @@ async function persistConfig() {
 
 // Première installation OU rejoindre un Gist existant.
 // Renvoie { gistId, created } .
-export async function setup({ username, password, token, gistId }) {
+export async function setup({ password, token, gistId }) {
   if (gistId) {
     // Rejoindre : on lit le sel depuis le Gist, on vérifie le mot de passe.
     const content = await fetchGist(token, gistId.trim());
@@ -97,7 +90,6 @@ export async function setup({ username, password, token, gistId }) {
     session.token = token;
     session.gistId = gistId.trim();
     session.salt = salt;
-    session.username = username;
     session.data = normalizeData(data);
     session.remoteUpdatedAt = payload.updatedAt || 0;
     await persistConfig();
@@ -110,7 +102,6 @@ export async function setup({ username, password, token, gistId }) {
   session.key = key;
   session.token = token;
   session.salt = salt;
-  session.username = username;
   session.data = emptyData();
   session.data.updatedAt = Date.now();
   const file = await buildGistFile();
@@ -137,7 +128,6 @@ export async function unlock(password) {
   session.key = key;
   session.salt = salt;
   session.gistId = cfg.gistId;
-  session.username = cfg.username;
   session.token = await decryptString(key, cfg.tokenEnc);
   session.data = normalizeData(data);
   session.remoteUpdatedAt = session.data.updatedAt || 0;

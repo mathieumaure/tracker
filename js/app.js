@@ -47,7 +47,6 @@ function init() {
 function showLogin() {
   el.loginForm.classList.remove('hidden');
   el.setupForm.classList.add('hidden');
-  $('#login-username').value = store.getUsername();
   $('#login-password').focus();
 }
 
@@ -103,7 +102,6 @@ async function onSetup(e) {
   btn.textContent = 'Connexion à GitHub…';
   try {
     const res = await store.setup({
-      username: $('#setup-username').value.trim(),
       password: $('#setup-password').value,
       token: $('#setup-token').value.trim(),
       gistId: $('#setup-gist').value.trim(),
