@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#b5179e" />
+  <title>Suivi</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <!-- Écran de connexion / configuration -->
+  <main id="auth-screen" class="screen">
+    <div class="card auth-card">
+      <div class="brand">🌸</div>
+
+      <!-- Connexion (appareil déjà configuré) -->
+      <form id="login-form" class="hidden">
+        <h1>Connexion</h1>
+        <label>Identifiant
+          <input id="login-username" type="text" autocomplete="username" required />
+        </label>
+        <label>Mot de passe
+          <input id="login-password" type="password" autocomplete="current-password" required />
+        </label>
+        <button type="submit" class="primary">Déverrouiller</button>
+        <p class="error" id="login-error"></p>
+        <button type="button" id="show-setup" class="link">Configurer un autre compte / appareil</button>
+      </form>
+
+      <!-- Première configuration / rejoindre -->
+      <form id="setup-form" class="hidden">
+        <h1>Configuration</h1>
+        <p class="muted">À faire une seule fois par appareil.</p>
+        <label>Identifiant
+          <input id="setup-username" type="text" autocomplete="username" required />
+        </label>
+        <label>Mot de passe <span class="hint">(sert à chiffrer vos données)</span>
+          <input id="setup-password" type="password" autocomplete="new-password" required minlength="4" />
+        </label>
+        <label>Token GitHub <span class="hint">(droit « gist »)</span>
+          <input id="setup-token" type="password" autocomplete="off" required placeholder="ghp_…" />
+        </label>
+        <label>Identifiant du Gist <span class="hint">(vide = en créer un nouveau)</span>
+          <input id="setup-gist" type="text" autocomplete="off" placeholder="laisser vide à la 1re installation" />
+        </label>
+        <button type="submit" class="primary">Démarrer</button>
+        <p class="error" id="setup-error"></p>
+        <p class="success" id="setup-success"></p>
+        <button type="button" id="show-login" class="link hidden">Retour à la connexion</button>
+        <details class="help">
+          <summary>Comment obtenir un token GitHub ?</summary>
+          <ol>
+            <li>Ouvrez github.com → Settings → Developer settings → <b>Personal access tokens</b> → Tokens (classic).</li>
+            <li>« Generate new token (classic) », cochez uniquement la case <b>gist</b>.</li>
+            <li>Copiez le token (ghp_…) et collez-le ci-dessus.</li>
+            <li>Sur le 1er appareil : laissez « Identifiant du Gist » vide. L'app vous donnera l'ID à reporter sur le 2e appareil.</li>
+          </ol>
+        </details>
+      </form>
+    </div>
+  </main>
+
+  <!-- Application -->
+  <main id="app-screen" class="screen hidden">
+    <header class="app-header">
+      <button id="prev-month" class="nav" aria-label="Mois précédent">‹</button>
+      <h1 id="month-label">—</h1>
+      <button id="next-month" class="nav" aria-label="Mois suivant">›</button>
+      <button id="logout" class="icon-btn" title="Verrouiller" aria-label="Verrouiller">🔒</button>
+    </header>
+
+    <div class="weekdays">
+      <span>L</span><span>M</span><span>M</span><span>J</span><span>V</span><span>S</span><span>D</span>
+    </div>
+    <div id="calendar" class="calendar"></div>
+
+    <div id="sync-status" class="sync-status"></div>
+
+    <section class="panel" id="summary-panel"></section>
+
+    <section class="legend">
+      <span><i class="dot period"></i> Règles</span>
+      <span><i class="dot ovulation"></i> Ovulation</span>
+      <span><i class="dot sex"></i> Rapport</span>
+      <span><i class="dot fertile"></i> Fenêtre fertile (prévue)</span>
+      <span><i class="dot pred-period"></i> Règles (prévues)</span>
+    </section>
+  </main>
+
+  <!-- Éditeur de jour -->
+  <div id="day-modal" class="modal hidden">
+    <div class="modal-card">
+      <h2 id="day-title">—</h2>
+      <div class="toggles">
+        <button class="toggle" data-flag="periodStart"><span class="t-ico period">🔴</span> Début des règles</button>
+        <button class="toggle" data-flag="periodEnd"><span class="t-ico period">🩸</span> Fin des règles</button>
+        <button class="toggle" data-flag="ovulation"><span class="t-ico ovulation">🥚</span> Ovulation</button>
+        <button class="toggle" data-flag="sex"><span class="t-ico sex">❤️</span> Rapport sexuel</button>
+      </div>
+      <button id="day-close" class="primary">Fermer</button>
+    </div>
+  </div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
