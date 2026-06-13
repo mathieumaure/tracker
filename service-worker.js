@@ -1,7 +1,10 @@
 // service-worker.js — cache applicatif pour le mode hors-ligne.
-// On ne met en cache QUE les fichiers de l'app (jamais de données).
+// Stratégie « réseau d'abord » : on sert toujours la dernière version en ligne,
+// et on ne se rabat sur le cache que si le réseau est indisponible. Ainsi les
+// mises à jour apparaissent immédiatement, tout en gardant le fonctionnement
+// hors-ligne. On ne met JAMAIS de données en cache, uniquement les fichiers app.
 
-const CACHE = 'cyclo-v2';
+const CACHE = 'cyclo-v3';
 const ASSETS = [
   './',
   './index.html',
@@ -32,12 +35,20 @@ self.addEventListener('activate', (e) => {
 
 self.addEventListener('fetch', (e) => {
   const url = new URL(e.request.url);
-  // Les appels à l'API GitHub passent toujours par le réseau.
+  // Les appels à l'API GitHub passent toujours par le réseau, jamais en cache.
   if (url.hostname.endsWith('github.com') || url.hostname.endsWith('githubusercontent.com')) {
     return;
   }
-  // Cache d'abord pour les ressources de l'app, repli réseau.
+  if (e.request.method !== 'GET') return;
+
+  // Réseau d'abord ; on rafraîchit le cache au passage ; repli cache si hors-ligne.
   e.respondWith(
-    caches.match(e.request).then((cached) => cached || fetch(e.request))
+    fetch(e.request)
+      .then((res) => {
+        const copy = res.clone();
+        caches.open(CACHE).then((c) => c.put(e.request, copy)).catch(() => {});
+        return res;
+      })
+      .catch(() => caches.match(e.request).then((c) => c || caches.match('./index.html')))
   );
 });
